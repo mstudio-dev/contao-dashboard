@@ -72,21 +72,6 @@ Das Dashboard wählt automatisch passende Icons basierend auf dem Modulnamen:
 - ⚙️ settings.svg - Einstellungen, System
 - 📊 dashboard.svg - Fallback
 
-## Struktur
-
-```
-contao/
-└── templates/
-    └── backend/
-        └── be_welcome.html5            # Template-Override mit Favoriten-Tiles
-public/
-└── icons/                              # Dashboard-Icons (12 SVG-Dateien)
-src/
-├── ContaoManager/
-│   └── Plugin.php                      # Contao Manager Integration
-└── MstudioContaoDashboardBundle.php    # Bundle-Definition
-```
-
 ## Technische Details
 
 - **Template-Override**: Überschreibt `be_welcome.html5` für native Integration
@@ -128,4 +113,4 @@ Beiträge sind willkommen! Bitte erstellen Sie einen Pull Request oder öffnen S
 
 ---
 
-Entwickelt mit ❤️ von [mstudio](https://mstudio.de)
+Entwickelt mit 🤖 von [mstudio](https://mstudio.de)
