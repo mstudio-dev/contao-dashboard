@@ -8,6 +8,14 @@ use Contao\BackendModule;
 use Contao\BackendUser;
 use Contao\Database;
 use Contao\System;
+use Contao\BackendTemplate;
+use Contao\Message;
+use Contao\Backend;
+use Contao\Versions;
+use Contao\Date;
+use Contao\Config;
+use Contao\StringUtil;
+use Knp\Bundle\TimeBundle\DateTimeFormatter;
 
 class DashboardController extends BackendModule
 {
@@ -55,26 +63,37 @@ class DashboardController extends BackendModule
     
     private function getWelcomeScreen(): string
     {
-        // Get the backend module class for the welcome screen
-        $className = 'Contao\BackendIndex';
-        
-        if (!class_exists($className)) {
-            return '';
+        System::loadLanguageFile('explain');
+
+        $objTemplate = new BackendTemplate('be_welcome');
+        $objTemplate->messages = Message::generateUnwrapped() . Backend::getSystemMessages();
+        $objTemplate->loginMsg = $GLOBALS['TL_LANG']['MSC']['firstLogin'];
+
+        $user = BackendUser::getInstance();
+
+        // Add the login message
+        if ($user->lastLogin > 0)
+        {
+            $formatter = new DateTimeFormatter(System::getContainer()->get('translator'));
+            $diff = $formatter->formatDiff(new \DateTime(date('Y-m-d H:i:s', $user->lastLogin)), new \DateTime());
+
+            $objTemplate->loginMsg = sprintf(
+                $GLOBALS['TL_LANG']['MSC']['lastLogin'][1],
+                '<time title="' . Date::parse(Config::get('datimFormat'), $user->lastLogin) . '">' . $diff . '</time>'
+            );
         }
-        
-        try {
-            // Create an instance of the BackendIndex module
-            $module = System::importStatic($className);
-            
-            // Generate the welcome screen content
-            if (method_exists($module, 'generate')) {
-                return $module->generate();
-            }
-        } catch (\Exception $e) {
-            // Silently fail if welcome screen cannot be loaded
-        }
-        
-        return '';
+
+        // Add the versions overview
+        Versions::addToTemplate($objTemplate);
+
+        $objTemplate->showDifferences = StringUtil::specialchars(str_replace("'", "\\'", $GLOBALS['TL_LANG']['MSC']['showDifferences']));
+        $objTemplate->recordOfTable = StringUtil::specialchars(str_replace("'", "\\'", $GLOBALS['TL_LANG']['MSC']['recordOfTable']));
+        $objTemplate->systemMessages = $GLOBALS['TL_LANG']['MSC']['systemMessages'];
+        $objTemplate->shortcuts = $GLOBALS['TL_LANG']['MSC']['shortcuts'][0];
+        $objTemplate->shortcutsLink = sprintf($GLOBALS['TL_LANG']['MSC']['shortcuts'][1], 'https://to.contao.org/docs/shortcuts');
+        $objTemplate->editElement = StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['editElement']);
+
+        return $objTemplate->parse();
     }
     
     private function getModuleIcon(string $module): string
