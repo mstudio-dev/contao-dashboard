@@ -7,6 +7,7 @@ namespace Mstudio\ContaoDashboard\Controller;
 use Contao\BackendModule;
 use Contao\BackendUser;
 use Contao\Database;
+use Contao\System;
 
 class DashboardController extends BackendModule
 {
@@ -47,6 +48,33 @@ class DashboardController extends BackendModule
         }
         
         $this->Template->tiles = $tiles;
+        
+        // Load standard Contao backend welcome screen
+        $this->Template->welcomeScreen = $this->getWelcomeScreen();
+    }
+    
+    private function getWelcomeScreen(): string
+    {
+        // Get the backend module class for the welcome screen
+        $className = 'Contao\BackendIndex';
+        
+        if (!class_exists($className)) {
+            return '';
+        }
+        
+        try {
+            // Create an instance of the BackendIndex module
+            $module = System::importStatic($className);
+            
+            // Generate the welcome screen content
+            if (method_exists($module, 'generate')) {
+                return $module->generate();
+            }
+        } catch (\Exception $e) {
+            // Silently fail if welcome screen cannot be loaded
+        }
+        
+        return '';
     }
     
     private function getModuleIcon(string $module): string
