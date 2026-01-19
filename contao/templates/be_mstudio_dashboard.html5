@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="<?= $this->asset('backend.css', 'contao-core-bundle') ?>">
-    <script src="<?= $this->asset('backend.js', 'contao-core-bundle') ?>"></script>
     <style>
         body {
             font-family: "Open Sans", sans-serif;
