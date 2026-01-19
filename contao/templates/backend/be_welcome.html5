@@ -1,0 +1,194 @@
+<?php
+use Contao\BackendUser;
+use Contao\Database;
+
+// Load favorites
+$tiles = [];
+$user = BackendUser::getInstance();
+
+if ($user && $user->id) {
+    $db = Database::getInstance();
+    $favorites = $db->prepare("SELECT * FROM tl_favorites WHERE user=? AND url != '' ORDER BY sorting")
+                    ->execute($user->id);
+    
+    while ($favorites->next()) {
+        $url = $favorites->url;
+        
+        if (preg_match('/do=([a-zA-Z0-9_]+)/', $url, $matches)) {
+            $module = $matches[1];
+            
+            $tiles[] = [
+                'label' => $favorites->title ?: $module,
+                'icon'  => $this->getModuleIcon($module),
+                'href'  => ltrim($url, '/'),
+            ];
+        }
+    }
+}
+
+// Icon mapping function
+function getModuleIcon($module) {
+    $iconMap = [
+        'article' => 'home.svg',
+        'page' => 'home.svg',
+        'tpl_editor' => 'code.svg',
+        'news' => 'news.svg',
+        'newsletter' => 'news.svg',
+        'calendar' => 'calendar.svg',
+        'faq' => 'news.svg',
+        'files' => 'download.svg',
+        'tl_files' => 'download.svg',
+        'download' => 'download.svg',
+        'downloads' => 'download.svg',
+        'form' => 'form.svg',
+        'comments' => 'mail.svg',
+        'user' => 'user.svg',
+        'user_group' => 'user.svg',
+        'member' => 'user.svg',
+        'member_group' => 'user.svg',
+        'themes' => 'layout.svg',
+        'page_layout' => 'layout.svg',
+        'image_sizes' => 'image.svg',
+        'style_sheets' => 'code.svg',
+        'settings' => 'settings.svg',
+        'maintenance' => 'settings.svg',
+        'log' => 'settings.svg',
+        'undo' => 'settings.svg',
+        'login' => 'user.svg',
+        'security' => 'user.svg',
+        'opt_in' => 'mail.svg',
+        'crawl' => 'settings.svg',
+    ];
+    
+    if (isset($iconMap[$module])) {
+        return $iconMap[$module];
+    }
+    
+    $moduleLower = strtolower($module);
+    
+    if (preg_match('/(content|article|page|text|element)/', $moduleLower)) return 'home.svg';
+    if (preg_match('/(news|blog|post|feed|rss)/', $moduleLower)) return 'news.svg';
+    if (preg_match('/(calendar|event|appointment|booking)/', $moduleLower)) return 'calendar.svg';
+    if (preg_match('/(file|media|download|upload|document|asset)/', $moduleLower)) return 'download.svg';
+    if (preg_match('/(form|survey|poll|contact|submission)/', $moduleLower)) return 'form.svg';
+    if (preg_match('/(user|member|profile|account|group|role)/', $moduleLower)) return 'user.svg';
+    if (preg_match('/(mail|email|message|newsletter|notification|comment)/', $moduleLower)) return 'mail.svg';
+    if (preg_match('/(theme|layout|template|design|style|css)/', $moduleLower)) return 'layout.svg';
+    if (preg_match('/(image|picture|photo|gallery|album)/', $moduleLower)) return 'image.svg';
+    if (preg_match('/(code|script|module|extension|plugin|bundle)/', $moduleLower)) return 'code.svg';
+    if (preg_match('/(setting|config|system|maintenance|log|security|crawl)/', $moduleLower)) return 'settings.svg';
+    
+    return 'dashboard.svg';
+}
+?>
+
+<style>
+.dashboard-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.dashboard-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    min-height: 150px;
+}
+.dashboard-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #589b0e;
+}
+.tile-icon {
+    margin-bottom: 15px;
+}
+.tile-icon img {
+    width: 48px;
+    height: 48px;
+}
+.tile-label {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+}
+.favorites-section h2 {
+    margin-bottom: 20px;
+}
+</style>
+
+<div id="tl_soverview">
+
+  <?php if (!empty($tiles)): ?>
+  <div class="favorites-section">
+    <h2>Favoriten</h2>
+    <div class="dashboard-tiles">
+      <?php foreach ($tiles as $tile): ?>
+        <a href="<?= $tile['href'] ?>" class="dashboard-tile">
+          <?php if (!empty($tile['icon'])): ?>
+            <span class="tile-icon">
+              <img src="bundles/mstudiocontaodashboard/icons/<?= $tile['icon'] ?>" alt="" width="48" height="48">
+            </span>
+          <?php endif; ?>
+          <span class="tile-label"><?= $tile['label'] ?></span>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <div id="tl_messages">
+    <h2><?= $this->systemMessages ?></h2>
+    <p><?= $this->loginMsg ?></p>
+    <?= $this->messages ?>
+  </div>
+
+  <div id="tl_shortcuts">
+    <h2><?= $this->shortcuts ?></h2>
+    <p><?= $this->shortcutsLink ?></p>
+  </div>
+
+  <div id="tl_versions">
+    <h2><?= $this->trans('MSC.latestChanges') ?></h2>
+    <?php if (!empty($this->versions)): ?>
+      <table class="tl_listing with-border">
+      <thead>
+        <tr>
+          <th><?= $this->trans('MSC.date') ?></th>
+          <th><?= $this->trans('MSC.user') ?></th>
+          <th><?= $this->trans('MSC.table') ?></th>
+          <th>ID</th>
+          <th><?= $this->trans('MSC.description') ?></th>
+          <th><?= $this->trans('MSC.version') ?></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($this->versions as $version): ?>
+          <tr class="hover-row" data-controller="contao--deeplink contao--operations-menu" data-action="contextmenu->contao--operations-menu#open">
+            <td><?= $version['date'] ?></td>
+            <td><?= $version['username'] ?: '-' ?></td>
+            <td><?= $version['shortTable'] ?></td>
+            <td><?= $version['pid'] ?></td>
+            <td><?= $version['description'] ?: '-' ?></td>
+            <td><?= $version['active'] ? '<strong>'.$version['version'].'</strong>' : $version['version'] ?></td>
+            <td class="tl_right_nowrap"><?= $version['operations'] ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+      </table>
+      <?= $this->pagination ?>
+    <?php else: ?>
+      <p><?= $this->trans('MSC.noVersions') ?></p>
+    <?php endif; ?>
+  </div>
+
+</div>

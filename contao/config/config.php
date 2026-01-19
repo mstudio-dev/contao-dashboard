@@ -2,11 +2,6 @@
 
 declare(strict_types=1);
 
-use Mstudio\ContaoDashboard\Controller\DashboardController;
+// Dashboard functionality is now integrated into the standard backend welcome screen
+// via template override (contao/templates/backend/be_welcome.html5)
 
-/**
- * Backend modules
- */
-$GLOBALS['BE_MOD']['system']['dashboard'] = [
-    'callback' => DashboardController::class,
-];
