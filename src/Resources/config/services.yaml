@@ -1,0 +1,6 @@
+services:
+    Mstudio\ContaoDashboard\Widget\ImportantActionsWidget:
+        arguments:
+            - '@translator'
+        tags:
+            - { name: contao.dashboard_widget, position: 100 }
