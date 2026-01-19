@@ -23,9 +23,6 @@ Ein schlankes Dashboard für Contao CMS, das Ihre **Backend-Favoriten** als ansp
 
 ```bash
 composer require mstudio/contao-dashboard
-php vendor/bin/contao-console contao:migrate
-php vendor/bin/contao-console assets:install
-php vendor/bin/contao-console cache:clear
 ```
 
 ### Via Contao Manager
@@ -74,47 +71,6 @@ Das Dashboard wählt automatisch passende Icons basierend auf dem Modulnamen:
 - 💻 code.svg - Templates, Extensions
 - ⚙️ settings.svg - Einstellungen, System
 - 📊 dashboard.svg - Fallback
-
-## Lokale Entwicklung mit DDEV
-
-Für die lokale Entwicklung mit DDEV folgen Sie der [offiziellen Contao-Dokumentation](https://docs.contao.org/5.x/manual/de/anleitungen/lokale-installation/ddev/#konfigurieren-eines-lokalen-pfades-als-ein-shared-repository-f%C3%BCr-alle-deine-bundles-innerhalb-des-ddev-containers).
-
-### Schnellanleitung
-
-1. Erstellen Sie `.ddev/docker-compose.bundles.yaml` in Ihrem Contao-Projekt:
-
-```yaml
-services:
-  web:
-    volumes:
-      - /home/$USER/repository:/home/$USER/repository:rw
-```
-
-2. Legen Sie dieses Bundle in `/home/$USER/repository/contao-dashboard` ab.
-
-3. Fügen Sie in der `composer.json` Ihres Contao-Projekts hinzu:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "~/repository/contao-dashboard",
-            "options": {
-                "symlink": true
-            }
-        }
-    ]
-}
-```
-
-4. Installieren Sie das Bundle:
-
-```bash
-ddev restart
-ddev composer require mstudio/contao-dashboard:@dev
-ddev exec console cache:clear
-```
 
 ## Struktur
 
