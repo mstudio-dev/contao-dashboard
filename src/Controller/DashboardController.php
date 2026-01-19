@@ -20,9 +20,9 @@ class DashboardController extends BackendModule
         $user = BackendUser::getInstance();
         
         if ($user && $user->id) {
-            // Load favorites from tl_favorites table
+            // Load favorites from tl_favorites table (only items with URL, no folders)
             $db = Database::getInstance();
-            $favorites = $db->prepare("SELECT * FROM tl_favorites WHERE user=? ORDER BY sorting")
+            $favorites = $db->prepare("SELECT * FROM tl_favorites WHERE user=? AND url != '' ORDER BY sorting")
                             ->execute($user->id);
             
             while ($favorites->next()) {
@@ -61,6 +61,7 @@ class DashboardController extends BackendModule
             'files' => 'download.svg',
             'form' => 'download.svg',
             'user' => 'home.svg',
+            'member' => 'home.svg',
         ];
         
         return $iconMap[$module] ?? 'dashboard.svg';
