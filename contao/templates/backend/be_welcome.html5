@@ -2,30 +2,6 @@
 use Contao\BackendUser;
 use Contao\Database;
 
-// Load favorites
-$tiles = [];
-$user = BackendUser::getInstance();
-
-if ($user && $user->id) {
-    $db = Database::getInstance();
-    $favorites = $db->prepare("SELECT * FROM tl_favorites WHERE user=? AND url != '' ORDER BY sorting")
-                    ->execute($user->id);
-    
-    while ($favorites->next()) {
-        $url = $favorites->url;
-        
-        if (preg_match('/do=([a-zA-Z0-9_]+)/', $url, $matches)) {
-            $module = $matches[1];
-            
-            $tiles[] = [
-                'label' => $favorites->title ?: $module,
-                'icon'  => $this->getModuleIcon($module),
-                'href'  => ltrim($url, '/'),
-            ];
-        }
-    }
-}
-
 // Icon mapping function
 function getModuleIcon($module) {
     $iconMap = [
@@ -79,6 +55,30 @@ function getModuleIcon($module) {
     if (preg_match('/(setting|config|system|maintenance|log|security|crawl)/', $moduleLower)) return 'settings.svg';
     
     return 'dashboard.svg';
+}
+
+// Load favorites
+$tiles = [];
+$user = BackendUser::getInstance();
+
+if ($user && $user->id) {
+    $db = Database::getInstance();
+    $favorites = $db->prepare("SELECT * FROM tl_favorites WHERE user=? AND url != '' ORDER BY sorting")
+                    ->execute($user->id);
+    
+    while ($favorites->next()) {
+        $url = $favorites->url;
+        
+        if (preg_match('/do=([a-zA-Z0-9_]+)/', $url, $matches)) {
+            $module = $matches[1];
+            
+            $tiles[] = [
+                'label' => $favorites->title ?: $module,
+                'icon'  => getModuleIcon($module),
+                'href'  => ltrim($url, '/'),
+            ];
+        }
+    }
 }
 ?>
 
