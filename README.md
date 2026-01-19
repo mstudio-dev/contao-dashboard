@@ -1,15 +1,16 @@
 # Mstudio Contao Dashboard
 
-Eine moderne Dashboard-Erweiterung für Contao CMS, die Ihre **Backend-Favoriten** als ansprechende Kacheln auf der Startseite darstellt.
+Ein schlankes Dashboard für Contao CMS, das Ihre **Backend-Favoriten** als ansprechende Kacheln auf der Backend-Startseite anzeigt.
 
 ## Funktionen
 
 - 📊 **Favoriten-Integration** - Nutzt die native Contao 5.x Favoriten-Funktion
-- 🎨 **Moderne Gestaltung** mit Hover-Effekten und responsivem Design
-- ⚡ **Automatische Startseite** - Dashboard wird beim Backend-Login angezeigt
+- 🎨 **Moderne Gestaltung** mit Hover-Effekten und responsivem Grid-Layout
+- 🎯 **Smarte Icon-Zuordnung** - Automatische Icon-Auswahl basierend auf Modulnamen
 - 👤 **Benutzerindividuell** - Jeder Benutzer sieht seine eigenen Favoriten
 - 📱 **Responsive** für mobile Endgeräte optimiert
 - 🔄 **Live-Synchronisation** - Änderungen an Favoriten erscheinen sofort
+- ⚡ **Native Integration** - Erweitert die Standard-Backend-Startseite
 
 ## Systemanforderungen
 
@@ -22,11 +23,6 @@ Eine moderne Dashboard-Erweiterung für Contao CMS, die Ihre **Backend-Favoriten
 
 ```bash
 composer require mstudio/contao-dashboard
-```
-
-Nach der Installation:
-
-```bash
 php vendor/bin/contao-console contao:migrate
 php vendor/bin/contao-console assets:install
 php vendor/bin/contao-console cache:clear
@@ -43,57 +39,41 @@ php vendor/bin/contao-console cache:clear
 ### Favoriten als Kacheln
 
 1. **Favoriten setzen**: Im Backend auf das ⭐-Symbol neben einem Menüpunkt klicken
-2. **Dashboard öffnen**: Das Dashboard wird automatisch als Startseite angezeigt
+2. **Backend öffnen**: Die Favoriten-Kacheln erscheinen automatisch auf der Startseite
 3. **Kacheln nutzen**: Klicken Sie auf eine Kachel, um zum jeweiligen Modul zu gelangen
 
-Das Dashboard zeigt automatisch alle Ihre Favoriten als übersichtliche Kacheln an. Die Beschriftung und Reihenfolge entspricht Ihrer Favoriten-Konfiguration in Contao.
+Das Dashboard zeigt automatisch alle Ihre Favoriten als übersichtliche Kacheln oberhalb der Standard-Backend-Widgets (System-Meldungen, Shortcuts, Letzte Änderungen).
 
-### Standard-Startseite
-
-Das Dashboard wird automatisch als Backend-Startseite angezeigt. Beim Aufruf von `/contao` werden Sie direkt zum Dashboard weitergeleitet.
-
-Sie können das Dashboard auch jederzeit über **System → Dashboard** im Backend-Menü aufrufen.
-
-## Anpassung
-
-### Kacheln verwalten
+### Favoriten verwalten
 
 Die Kacheln werden automatisch aus Ihren **Contao-Favoriten** generiert:
 
 - Im Backend das ⭐-Symbol neben Menüpunkten anklicken
 - Favoriten per Drag & Drop in der Favoriten-Verwaltung sortieren
-- Favoriten löschen über die Favoriten-Verwaltung
+- Favoriten-Ordner werden ignoriert (nur direkte Links werden angezeigt)
 
-### Fallback-Kacheln (wenn keine Favoriten gesetzt)
+### Automatische Icon-Zuordnung
 
-Wenn ein Benutzer noch keine Favoriten gesetzt hat, werden Standard-Kacheln angezeigt. Diese können in `contao/config/config.php` angepasst werden:
+Das Dashboard wählt automatisch passende Icons basierend auf dem Modulnamen:
 
-```php
-// contao/config/config.php
+- **Direkte Zuordnung** für 30+ häufige Contao-Module
+- **Pattern-basierte Erkennung** für unbekannte Module
+- **Kategorien**: Content, News, Calendar, Files, Forms, Users, Mail, Design, Images, Code, Settings
 
-$GLOBALS['DASHBOARD_TILES'] = [
-    [
-        'label' => 'Seitenstruktur',
-        'icon'  => 'home.svg',
-        'href'  => 'contao?do=page',
-    ],
-    [
-        'label' => 'Artikel',
-        'icon'  => 'home.svg',
-        'href'  => 'contao?do=article',
-    ],
-    // Weitere Kacheln...
-];
-```
+#### Verfügbare Icons
 
-### Template anpassen
-
-Das Template `be_mstudio_dashboard.html5` kann im eigenen Theme-Ordner überschrieben werden:
-
-```
-templates/
-    be_mstudio_dashboard.html5
-```
+- 🏠 home.svg - Seiten, Artikel
+- 📰 news.svg - News, Newsletter, Blog
+- 📅 calendar.svg - Kalender, Events
+- 📥 download.svg - Dateien, Downloads
+- 📝 form.svg - Formulare
+- 👤 user.svg - Benutzer, Mitglieder
+- ✉️ mail.svg - E-Mail, Newsletter, Kommentare
+- 🎨 layout.svg - Themes, Layouts
+- 🖼️ image.svg - Bilder, Galerien
+- 💻 code.svg - Templates, Extensions
+- ⚙️ settings.svg - Einstellungen, System
+- 📊 dashboard.svg - Fallback
 
 ## Lokale Entwicklung mit DDEV
 
@@ -140,27 +120,23 @@ ddev exec console cache:clear
 
 ```
 contao/
-├── config/
-│   └── config.php                      # Backend-Modul-Registrierung
 └── templates/
-    └── be_mstudio_dashboard.html5      # Dashboard-Template
+    └── backend/
+        └── be_welcome.html5            # Template-Override mit Favoriten-Tiles
 public/
-└── icons/                              # Dashboard-Icons
+└── icons/                              # Dashboard-Icons (12 SVG-Dateien)
 src/
 ├── ContaoManager/
 │   └── Plugin.php                      # Contao Manager Integration
-├── Controller/
-│   └── DashboardController.php         # Dashboard-Controller
-├── EventListener/
-│   └── BackendMenuListener.php         # Automatische Weiterleitung
 └── MstudioContaoDashboardBundle.php    # Bundle-Definition
 ```
 
 ## Technische Details
 
+- **Template-Override**: Überschreibt `be_welcome.html5` für native Integration
 - **Favoriten-Integration**: Liest Favoriten aus `tl_favorites` Tabelle
 - **Benutzerabhängig**: Jeder Backend-Benutzer hat individuelle Kacheln
-- **Auto-Redirect**: EventSubscriber leitet Backend-Startseite zum Dashboard um
+- **Minimaler Footprint**: Keine Controller, keine Services, nur Template + Icons
 - **Contao 5 kompatibel**: Nutzt aktuelle Contao-APIs
 
 ## Lizenz
@@ -184,9 +160,10 @@ Bei Fragen oder Problemen können Sie:
 
 ### Version 1.0.0
 - Initiales Release
-- Dashboard mit Kachel-Layout basierend auf Contao-Favoriten
-- Automatische Backend-Startseite
-- Responsive Design
+- Dashboard-Tiles basierend auf Contao-Favoriten
+- Native Integration in Backend-Startseite
+- 12 Icons mit smarter Auto-Zuordnung
+- Responsive Grid-Layout
 - Contao 5.6+ Kompatibilität
 
 ## Mitwirken
