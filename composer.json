@@ -19,6 +19,11 @@
         }
     },
     "extra": {
-        "contao-manager-plugin": "Mstudio\\ContaoDashboard\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "Mstudio\\ContaoDashboard\\ContaoManager\\Plugin",
+        "contao": {
+            "sources": {
+                "contao": "contao"
+            }
+        }
     }
 }

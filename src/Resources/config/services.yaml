@@ -1,6 +1,12 @@
 services:
-    Mstudio\ContaoDashboard\Widget\ImportantActionsWidget:
-        arguments:
-            - '@translator'
-        tags:
-            - { name: contao.dashboard_widget, position: 100 }
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Mstudio\ContaoDashboard\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Resources}'
+
+    Mstudio\ContaoDashboard\Controller\DashboardController:
+        tags: ['controller.service_arguments']
+        public: true

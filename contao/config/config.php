@@ -9,5 +9,4 @@ use Mstudio\ContaoDashboard\Controller\DashboardController;
  */
 $GLOBALS['BE_MOD']['system']['dashboard'] = [
     'callback' => DashboardController::class,
-    'icon' => 'bundles/mstudiocontaodashboard/icons/dashboard.svg',
 ];
